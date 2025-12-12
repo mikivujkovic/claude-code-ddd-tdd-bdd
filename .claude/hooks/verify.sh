@@ -10,10 +10,26 @@ fi
 echo "Running verification for phase: $PHASE"
 
 if [ -f package.json ]; then
-  if npm run -s lint >/dev/null 2>&1; then npm run -s lint; fi
-  if npm run -s test >/dev/null 2>&1; then npm run -s test; fi
-  if npm run -s typecheck >/dev/null 2>&1; then npm run -s typecheck; fi
-  if [ "$PHASE" = "bdd" ] && npm run -s test:bdd >/dev/null 2>&1; then npm run -s test:bdd; fi
+  # Check if command exists by checking package.json scripts
+  if grep -q '"lint"' package.json 2>/dev/null; then
+    echo "Running lint..."
+    npm run lint
+  fi
+
+  if grep -q '"test"' package.json 2>/dev/null; then
+    echo "Running tests..."
+    npm run test
+  fi
+
+  if grep -q '"typecheck"' package.json 2>/dev/null; then
+    echo "Running typecheck..."
+    npm run typecheck
+  fi
+
+  if [ "$PHASE" = "bdd" ] && grep -q '"test:bdd"' package.json 2>/dev/null; then
+    echo "Running BDD tests..."
+    npm run test:bdd
+  fi
 fi
 
 echo "✅ VERIFY PASSED"
